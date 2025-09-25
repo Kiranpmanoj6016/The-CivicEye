@@ -106,6 +106,63 @@
         await submitIssue(photoFile, desc, tags, selectedLat, selectedLng, currentUser.uid);
         photoInput.value = ""; document.getElementById("issueDesc").value = ""; document.getElementById("issueTags").value = "";
     }
+<div id="progressBarContainer" style="width: 100%; background-color: #e0e0e0; border-radius: 5px; margin-top: 10px; display: none;">
+  <div id="progressBar" style="height: 20px; width: 0%; background-color: #4CAF50; text-align: center; line-height: 20px; color: white; border-radius: 5px;">0%</div>
+</div>
+  async function handleSubmission() {
+    const photoInput = document.getElementById("issuePhoto");
+    const desc = document.getElementById("issueDesc").value;
+    const tagsInput = document.getElementById("issueTags").value;
+    const photoFile = photoInput.files[0];
+    const tags = tagsInput ? [tagsInput] : [];
+
+    if (!desc || !photoFile || tags.length === 0) {
+        alert("Please provide a description, photo, and select an issue type.");
+        return;
+    }
+
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+        alert("You must be logged in.");
+        return;
+    }
+
+    const progressBarContainer = document.getElementById("progressBarContainer");
+    const progressBar = document.getElementById("progressBar");
+    
+    // Show the progress bar and reset its state
+    progressBarContainer.style.display = "block";
+    progressBar.style.width = "0%";
+    progressBar.textContent = "0%";
+
+    const updateProgress = (progress) => {
+        progressBar.style.width = progress + "%";
+        progressBar.textContent = `${Math.round(progress)}%`;
+        if (progress >= 100) {
+            // Give a final visual confirmation before hiding the bar
+            progressBar.textContent = "Complete!";
+            setTimeout(() => {
+                progressBarContainer.style.display = "none";
+                alert("Issue submitted successfully!");
+            }, 500); // Wait for a moment before hiding the bar
+        }
+    };
+
+    try {
+        // Pass the progress callback function to submitIssue
+        await submitIssue(photoFile, desc, tags, selectedLat, selectedLng, currentUser.uid, updateProgress);
+        
+        // Clear form fields
+        photoInput.value = "";
+        document.getElementById("issueDesc").value = "";
+        document.getElementById("issueTags").value = "";
+
+    } catch (error) {
+        console.error("Submission failed:", error);
+        alert("An error occurred. Please try again.");
+        progressBarContainer.style.display = "none"; // Hide the bar on error
+    }
+}
   </script>
 </body>
 </html>
