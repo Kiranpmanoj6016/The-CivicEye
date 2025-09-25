@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About CIVIC EYE</title>
+    <link rel="stylesheet" href="style.css"/>
+    <style>
+        body {
+            /* NEW: Animated background style */
+            background: linear-gradient(90deg, #FF9933, #FFFFFF, #138808, #FFFFFF, #FF9933);
+            background-size: 400% 400%;
+            animation: gradient-scroll 15s ease infinite;
+        }
+        @keyframes gradient-scroll {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .about-container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .about-content h2 {
+            font-size: 2.2rem;
+            color: #138808;
+            margin-top: 25px;
+            font-weight: 700;
+        }
+        .about-content p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #555;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+        .stats-section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 20px 0;
+        }
+        .milestone-cards {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            width: 100%;
+            max-width: 350px;
+        }
+        .features-list {
+            list-style-type: none;
+            padding: 0;
+            text-align: left;
+            margin: 20px 0;
+        }
+        .features-list li {
+            background: #f9f9f9;
+            border-left: 5px solid #ff9933;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #333;
+            transition: transform 0.2s ease-in-out;
+        }
+        .features-list li:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .main-content-wrapper {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.3);
+            border-left: 2px solid #06038d;
+            border-right: 2px solid #06038d;
+            border-top: 2px solid #06038d;
+            padding-top: 20px;
+        }
+        .top-right-nav {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+        .section-divider {
+            border: 0;
+            height: 1px;
+            background: #ccc;
+            margin: 40px auto;
+            width: 80%;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="top-right-nav">
+        <a href="index.html" style="text-decoration: none;"><button style="width: auto; padding: 10px 20px; background-color: #6c757d;">&larr; Back to Login</button></a>
+    </div>
+
+    <header>
+        <img src="logo.png" alt="CIVIC EYE Logo" class="header-logo">
+        <h1>CIVIC EYE</h1>
+        <p>Empowering Citizens for a Better Nation</p>
+    </header>
+
+    <div class="main-content-wrapper">
+        <div class="about-container">
+            <h2>Our Purpose</h2>
+            <p>
+                CIVIC EYE is a crowdsourced civic issue reporting and resolution system designed to bridge the gap between citizens and local government. We provide a streamlined, mobile-first platform that empowers community members to report everyday civic issues in real-time.
+            </p>
+            <hr class="section-divider">
+
+            <h2>Motivation</h2>
+            <p>
+                Local governments often struggle with inefficient and slow reporting mechanisms for issues. Our motivation is to provide a modern, easy-to-use solution that makes reporting and resolving these issues simple, transparent, and effective.
+            </p>
+            <hr class="section-divider">
+            
+            <h2>Expected Impact</h2>
+            <p>
+                By providing an effortless way for citizens to submit issues, we expect to see a significant increase in civic engagement, leading to faster response times, more efficient resource allocation, and a higher level of government accountability.
+            </p>
+            <hr class="section-divider">
+            
+            <div style="background: none; box-shadow: none; padding: 0;">
+                <h2>Current Impact Statistics</h2>
+                <div class="milestone-cards">
+                    <div class="milestone-card">
+                        <p class="milestone-number" id="accepted-issues">0</p>
+                        <p class="milestone-label">In Progress</p>
+                    </div>
+                    <div class="milestone-card">
+                        <p class="milestone-number" id="completed-issues">0</p>
+                        <p class="milestone-label">Completed</p>
+                    </div>
+                    <div class="milestone-card">
+                        <p class="milestone-number" id="pending-issues">0</p>
+                        <p class="milestone-label">Pending</p>
+                    </div>
+                </div>
+                
+                <div class="stats-section">
+                    <div class="chart-container">
+                        <canvas id="issueStatusDoughnutChart"></canvas>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="issueStatusBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <hr class="section-divider">
+
+            <div style="background: none; box-shadow: none; padding: 0;">
+                <h2>Key Features</h2>
+                <ul class="features-list">
+                    <li><strong style="color: #138808;">Live Location Tagging:</strong> Effortlessly report issues with automatic GPS location and a map-based interface.</li>
+                    <li><strong style="color: #138808;">Dynamic Dashboards:</strong> Dedicated portals for citizens, administrators, and department staff with real-time data.</li>
+                    <li><strong style="color: #138808;">Issue Hotspots:</strong> The admin map highlights priority areas where multiple issues are clustered.</li>
+                    <li><strong style="color: #138808;">Staff Management:</strong> Administrators can assign issues to staff and track their performance.</li>
+                    <li><strong style="color: #138808;">Real-Time Updates:</strong> Citizens receive live notifications when the status of their reports change.</li>
+                </ul>
+            </div>
+            <hr class="section-divider">
+            
+            <h2>Meet the Team</h2>
+            <p>This project was built with passion by Team CodeForge for the Smart India Hackathon.</p>
+            <div class="milestone-cards">
+                <div class="milestone-card">
+                    <p class="milestone-number" style="font-size: 1.5rem;">ALOK K L</p>
+                    <p class="milestone-label">Leader, Backend & Database</p>
+                </div>
+                <div class="milestone-card">
+                    <p class="milestone-number" style="font-size: 1.5rem;">DIVYA S</p>
+                    <p class="milestone-label">Presentation Lead, UI/UX</p>
+                </div>
+                <div class="milestone-card">
+                    <p class="milestone-number" style="font-size: 1.5rem;">KIRAN P MANOJ</p>
+                    <p class="milestone-label">Presentation Lead, UI/UX</p>
+                </div>
+                <div class="milestone-card">
+                    <p class="milestone-number" style="font-size: 1.5rem;">ADITHYAKRISHNA B</p>
+                    <p class="milestone-label">Frontend & Testing</p>
+                </div>
+                <div class="milestone-card">
+                    <p class="milestone-number" style="font-size: 1.5rem;">ABHIRAM S KUMAR</p>
+                    <p class="milestone-label">Frontend & Testing</p>
+                </div>
+                <div class="milestone-card">
+                    <p class="milestone-number" style="font-size: 1.5rem;">AYUSH G</p>
+                    <p class="milestone-label">Frontend Lead</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2025-26 Smart India Hackathon. All rights reserved.</p>
+        <p>Team CodeForge | Contact: 8075185774, 8848081237</p>
+    </footer>
+
+    <script type="module">
+        import { db } from "./firebase-config.js";
+        import { collection, getDocs, query } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        
+        async function fetchAllIssues() {
+            const snapshot = await getDocs(collection(db, "issues"));
+            const issues = [];
+            snapshot.forEach(doc => { issues.push({ id: doc.id, ...doc.data() }); });
+            return issues;
+        }
+        
+        async function loadImpactStats() {
+            const allIssues = await fetchAllIssues();
+            
+            const acceptedCount = allIssues.filter(issue => issue.status === "In Progress").length;
+            const completedCount = allIssues.filter(issue => issue.status === "Completed").length;
+            const pendingCount = allIssues.filter(issue => issue.status === "Pending").length;
+            
+            document.getElementById("accepted-issues").textContent = acceptedCount;
+            document.getElementById("completed-issues").textContent = completedCount;
+            document.getElementById("pending-issues").textContent = pendingCount;
+
+            const labels = ['In Progress', 'Completed', 'Pending'];
+            const dataCounts = [acceptedCount, completedCount, pendingCount];
+            const backgroundColors = [
+                'rgba(13, 110, 253, 0.8)',
+                'rgba(19, 136, 8, 0.8)',
+                'rgba(255, 193, 7, 0.8)'
+            ];
+            const borderColors = [
+                'rgba(13, 110, 253, 1)',
+                'rgba(19, 136, 8, 1)',
+                'rgba(255, 193, 7, 1)'
+            ];
+
+            const doughnutCtx = document.getElementById('issueStatusDoughnutChart').getContext('2d');
+            new Chart(doughnutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Issue Distribution',
+                        data: dataCounts,
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        title: { display: true, text: 'Overall Issue Status', font: { size: 16, weight: 'bold' } }
+                    }
+                }
+            });
+
+            const barCtx = document.getElementById('issueStatusBarChart').getContext('2d');
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Number of Issues',
+                        data: dataCounts,
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Issues by Status', font: { size: 16, weight: 'bold' } }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        loadImpactStats();
+    </script>
+</body>
+</html>

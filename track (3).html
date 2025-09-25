@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track My Issues - CIVIC EYE</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- Requested Style Changes --- */
+        header {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #0d5c05;
+        }
+        .status-pending {
+            color: orange;
+        }
+        
+        /* New Styles for the Push Notification Pop-up */
+        #pushNotification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #138808;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: opacity 0.5s, transform 0.5s;
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        .show-notification {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+    </style>
+</head>
+<body>
+    <header>Track My Issues</header>
+
+    <div id="pushNotification">
+        <span id="notificationMessage"></span>
+    </div>
+
+    <div class="dashboard-section">
+        <a href="dashboard_citizen.html"><button style="background-color: #6c757d;">Report a New Issue</button></a>
+    </div>
+
+    <div class="dashboard-section">
+        <h2>Notifications</h2>
+        <ul class="issue-list" id="notificationContainer"><li>No new notifications.</li></ul>
+    </div>
+
+    <div class="dashboard-section">
+        <h2>My Submitted Issues</h2>
+        <div id="myIssuesContainer"></div>
+    </div>
+
+    <footer>
+        <p>© 2025-26 Smart India Hackathon. All rights reserved.</p>
+        <p>Team CodeForge | Contact: 8075185774, 8848081237</p>
+    </footer>
+
+    <script type="module">
+        import { auth, db } from "./firebase-config.js";
+        import { fetchCitizenIssues } from "./script.js";
+
+        async function loadMyIssues() {
+            const myIssuesContainer = document.getElementById("myIssuesContainer");
+            const notificationContainer = document.getElementById("notificationContainer");
+            const pushNotification = document.getElementById("pushNotification");
+            const notificationMessage = document.getElementById("notificationMessage");
+            const currentUser = auth.currentUser;
+
+            if (!currentUser) {
+                myIssuesContainer.innerHTML = "<p>Please log in to see your issues. <a href='index.html'>Login here</a>.</p>";
+                notificationContainer.innerHTML = "<li>Please log in to see notifications.</li>";
+                return;
+            }
+
+            myIssuesContainer.innerHTML = "<p>Fetching your issues...</p>";
+            notificationContainer.innerHTML = "";
+            let hasNewNotifications = false;
+            let newNotificationMessage = "";
+
+            const issues = await fetchCitizenIssues(currentUser.uid);
+            myIssuesContainer.innerHTML = "";
+
+            if (issues.length === 0) {
+                myIssuesContainer.innerHTML = "<p>You have not submitted any issues yet.</p>";
+            }
+
+            issues.forEach(issue => {
+                const status = issue.status;
+
+                // Check for a status change and generate a new notification
+                const lastKnownStatus = localStorage.getItem(`issueStatus_${issue.id}`);
+                if (lastKnownStatus && lastKnownStatus !== status) {
+                    hasNewNotifications = true;
+                    newNotificationMessage = `The status of your issue "${issue.description}" has been updated to "${status}".`;
+                    const li = document.createElement("li");
+                    li.innerHTML = newNotificationMessage;
+                    notificationContainer.appendChild(li);
+                }
+
+                // Update the last known status in local storage for the next visit
+                localStorage.setItem(`issueStatus_${issue.id}`, status);
+
+                let progress = 10;
+                if (status === 'In Progress') progress = 50;
+                if (status === 'Completed' || status === 'Rejected') progress = 100;
+                const issueElement = document.createElement("div");
+                issueElement.className = 'issue-tracker';
+                issueElement.innerHTML = `
+                    <h4>${issue.description}</h4>
+                    <div class="progress-bar-container"><div class="progress-bar" style="width: ${progress}%;"></div></div>
+                    <p>Status: <strong class="status-${status.toLowerCase().replace(' ', '-')}">${status}</strong></p>
+                `;
+                myIssuesContainer.appendChild(issueElement);
+            });
+            
+            if (hasNewNotifications) {
+                // Show the push notification pop-up
+                notificationMessage.textContent = newNotificationMessage;
+                pushNotification.style.display = 'block';
+                setTimeout(() => {
+                    pushNotification.classList.add('show-notification');
+                }, 10); // Small delay to allow for the transition
+                
+                // Hide the pop-up after 5 seconds
+                setTimeout(() => {
+                    pushNotification.classList.remove('show-notification');
+                    setTimeout(() => {
+                        pushNotification.style.display = 'none';
+                    }, 500); // Wait for transition to finish
+                }, 5000);
+            } else {
+                notificationContainer.innerHTML = "<li>No new notifications.</li>";
+            }
+        }
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                loadMyIssues();
+            } else {
+                document.getElementById("myIssuesContainer").innerHTML = "<p>Please log in to see your issues. <a href='index.html'>Login here</a>.</p>";
+                document.getElementById("notificationContainer").innerHTML = "<li>Please log in to see notifications.</li>";
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+// firebase-config.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.6.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD3PQC4JIGByQXfRX4ItTGUFdHIhsDRV3I",
+  authDomain: "civiceye-60327.firebaseapp.com",
+  projectId: "civiceye-60327",
+  storageBucket: "civiceye-60327.appspot.com",
+  messagingSenderId: "386549114060",
+  appId: "1:386549114060:web:a36ffac1d2b53210040e69"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+export { db, auth };
