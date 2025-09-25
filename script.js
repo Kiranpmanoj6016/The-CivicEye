@@ -1,7 +1,72 @@
 // Import the necessary Firebase services from your configuration file
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
 import { auth, db } from "./firebase-config.js";
 import { signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 import { collection, addDoc, getDocs, updateDoc, doc, serverTimestamp, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
+
+// Initialize Firebase Storage
+const storage = getStorage();
+
+export async function submitIssue(photoFile, description, tags, lat, lng, userID, onProgressCallback) {
+  if (!photoFile || !description) {
+    alert("Please fill all fields and attach a photo.");
+    return;
+  }
+
+  try {
+    // Create a unique file name to avoid conflicts
+    const fileName = `issues/${userID}_${new Date().getTime()}_${photoFile.name}`;
+    const storageRef = ref(storage, fileName);
+
+    // Use uploadBytesResumable to track the upload progress
+    const uploadTask = uploadBytesResumable(storageRef, photoFile);
+
+    // Monitor the upload state and report progress
+    uploadTask.on('state_changed',
+      (snapshot) => {
+        // Calculate progress percentage
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        // Call the provided callback function with the current progress
+        if (onProgressCallback) {
+          onProgressCallback(progress);
+        }
+      },
+      (error) => {
+        // Handle unsuccessful uploads
+        console.error("Image upload failed", error);
+        alert("Image upload failed: " + error.message);
+        if (onProgressCallback) {
+          onProgressCallback(0); // Reset progress on error
+        }
+      },
+      async () => {
+        // Handle successful uploads on completion
+        try {
+          // Get the download URL of the uploaded image
+          const photoURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+          // Add the issue details to Firestore
+          await addDoc(collection(db, "issues"), {
+            userID, description, photoURL, tags, status: "Pending", timestamp: serverTimestamp(),
+            location: { latitude: lat, longitude: lng }
+          });
+
+          // Report completion
+          if (onProgressCallback) {
+            onProgressCallback(100);
+          }
+        } catch (error) {
+          console.error("Error submitting issue to Firestore:", error);
+          alert("Error submitting issue details: " + error.message);
+        }
+      }
+    );
+  } catch (error) {
+    console.error("Error with submission process:", error);
+    alert("An unexpected error occurred: " + error.message);
+  }
+}
 
 // --- HELPER FUNCTION to calculate distance between two lat/lng points ---
 export function getDistance(lat1, lon1, lat2, lon2) {
@@ -110,3 +175,5 @@ export async function deleteIssue(issueID) {
 export function logout() {
   signOut(auth).then(() => { window.location.href = "index.html"; });
 }
+
+
